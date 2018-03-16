@@ -42,6 +42,9 @@ class StringtoTable(object):
             else:
                 split_String.append(x)
 
+        if len(split_String) == row_start:
+            return
+
         for x in split_String[row_start:]:
             # split table into string,one row---> a string
             if len(x) is not 0:
@@ -64,9 +67,12 @@ class StringtoTable(object):
 
         self.table_Head = row_Head
         self.table_Row = row_Content
+        return
 
     def inqueryTable(self, key1=None, value1=None, key2=None):
-        _value = None
+        if self.table_Head == [] or self.table_Row == []:
+            return None
+        _value = ""
         _index = self.table_Head.index(key2)
         _index1 = self.table_Head.index(key1)
         for x in self.table_Row:
@@ -75,9 +81,44 @@ class StringtoTable(object):
         return _value
 
 
+class StringtoKeyValue(object):
+
+    def __init__(self, _string):
+        self.string = _string
+        self.keyValueList = {}
+        self.getKeyValue(_string)
+
+    def getKeyValue(self, string):
+        a = string
+        for i in a.split('\r\n'):
+            if i == '':
+                pass
+            else:
+                res = re.split(pattern=r'(\s\s+)|,', string=i)
+                for x in res:
+                    if x is not None and re.search(pattern=r':|=', string=x):
+                        pair = x.split(":")
+                        pair[0] = pair[0].strip()
+                        pair[1] = pair[1].strip()
+                        self.keyValueList[pair[0]] = pair[1]
+        pass
+
+    def getValueByKey(self, key=None):
+        return self.keyValueList[key]
+
+    def insertVlaueKey(self, key=None, value=None):
+        pass
+
+
 if __name__ == "__main__":
+
     a = "\r\nPort Channel IPv4 Sessions\r\nshisi\r\nshisi\r\nNeighAddr                              LD/RD         RH/RS     State     Int             Parent Int\r\n20.0.0.2                             4099/4100       Up        Up        Gi4             Po1            \r\n20.0.0.2                             4097/4101       Up        Up        Gi6             Po1            \r\n"
-    print(a)
+    a = "\r\nPort Channel IPv4 Sessions\r\nshisi\r\nshisi\r\n"
     myTableClass = StringtoTable(_string=a, descrLine=3)
     get = myTableClass.inqueryTable(key1="Int", value1="Gi4", key2="NeighAddr")
     print(get)
+
+    b = '\r\nIPv6 Sessions\r\nNeighAddr                              LD/RD         RH/RS     State     Int\r\n2001:2001::2                            1/1          Up        Up        Gi4\r\nSession state is UP and not using echo function.\r\nSession Host: Hardware\r\nOurAddr: 2001:2001::1                           \r\nHandle: 1\r\nLocal Diag: 0, Demand mode: 0, Poll bit: 0\r\nMinTxInt: 50000, MinRxInt: 50000, Multiplier: 3\r\nReceived MinRxInt: 50000, Received Multiplier: 3\r\nHolddown (hits): 0(0), Hello (hits): 50(0)\r\nRx Count: 2068, Rx Interval (ms) min/max/avg: 38/49/43\r\nTx Count: 2753, Tx Interval (ms) min/max/avg: 24/45/33\r\nElapsed time watermarks: 0 0 (last: 0)\r\nRegistered protocols: IPv6 Static CEF \r\nTemplate: bfd_tempalte\r\nUptime: 00:01:44\r\nLast packet: Version: 1                  - Diagnostic: 0\r\n             State bit: Up               - Demand bit: 0\r\n             Poll bit: 0                 - Final bit: 0\r\n             C bit: 1                                   \r\n             Multiplier: 3               - Length: 24\r\n             My Discr.: 1                - Your Discr.: 1\r\n             Min tx interval: 50000      - Min rx interval: 50000\r\n             Min Echo interval: 0       \r\n'
+    myKeyValueContain = StringtoKeyValue(b)
+    print(myKeyValueContain.keyValueList)
+    print(myKeyValueContain.getValueByKey(key='Multiplier'))
