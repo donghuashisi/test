@@ -1,0 +1,14 @@
+def loggin(level="LOG"):
+    def innerloggin(func):
+        def wrapper(*args,**kwargs):
+            print "[{level}]: enter {func} ".format(level=level,func=func.__name__)
+            func(*args,**kwargs)
+            print "[{level}]:exit {func}".format(level=level,func=func.__name__)
+        return  wrapper
+    return  innerloggin
+
+@loggin(level="DEBUG")
+def Func1(para1):
+    print para1
+
+Func1("EPC")
